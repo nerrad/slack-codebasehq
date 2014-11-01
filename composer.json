@@ -1,0 +1,22 @@
+{
+	"name": "nerrad/slack-codebase",
+	"description":"An application for receiving requests from slack (outgoing webhook) and integrating with Codebasehq for touching tickets and or creating new tickets",
+	"keywords": ["slack", "api", "codebase"],
+	"type": "application",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Darren Ethier",
+			"homepage": "http:roughsmootheng.in",
+			"email": "darren@roughsmootheng.in"
+		}
+	],
+	"require" : {
+		"cleentfaar/slack" : "0.9.4"
+	},
+	"autoload" : {
+		"psr-4":{
+			"Nerrad\\SlackCb" : ""
+		}
+	}
+}
