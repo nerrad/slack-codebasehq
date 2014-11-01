@@ -58,25 +58,17 @@ class React {
 	 */
 	public function cbtkthelp( OutgoingWebhookRequest $request ) {
 
+		$helptext = file_get_contents( 'cbtkthelp.template.md' );
+
 		$response = array(
 			'text' => "I've grabbed the latest information for you on how to use the codebase-slack integration:",
 			'attachments'  => array(
-				'title' => '*Commands:*',
-				'text' => 'These are various commands that you can use and their format to trigger various codebase interactions',
-				'mrkdwn_in' => array( 'text', 'title' ),
-				'color' => 'good',
-				'fields' => array(
-						array(
-							'title' => 'Some Title',
-							'value' => 'some value',
-							'short' => true
-						),
-						array(
-							'title' => 'Title B',
-							'value' => 'another value',
-							'short' => true
-							)
-					),
+					array(
+						'title' => '*Commands:*',
+						'text' => $helptext,
+						'mrkdwn_in' => array( 'text', 'title' ),
+						'color' => 'good'
+					)
 				)
 			);
 
