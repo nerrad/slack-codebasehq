@@ -43,7 +43,7 @@ class Request {
 			);
 		$send = array();
 		foreach ( $this->_reqArray as $key => $value ) {
-			if ( isset( $required[$key] ) ) {
+			if ( in_array( $key, $required ) ) {
 				$send[$key] = $value;
 			}
 		}
