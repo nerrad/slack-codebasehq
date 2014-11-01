@@ -30,7 +30,7 @@ class React {
 		}
 
 		//return json response
-		return new JsonResponse( [ 'text' => $response ] );
+		return new JsonResponse( array( 'text' => $response ) );
 	}
 
 

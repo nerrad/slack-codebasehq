@@ -13,7 +13,7 @@ class JsonResponse {
 			header('Content-Type: application/json; charset=UTF-8', true, 200);
 		}
 
-		echo json_encode( $json );
+		echo json_encode( $response );
 		exit();
 	}
 }
