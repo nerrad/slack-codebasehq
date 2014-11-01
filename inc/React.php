@@ -46,7 +46,7 @@ class React {
 		$token = $request->getToken();
 
 		if ( $token != $this->_config->expected_token ) {
-			header( 'Unauthorized.', true, 501 );
+			header( 'Unauthorized.', true, 401 );
 			exit();
 		}
 

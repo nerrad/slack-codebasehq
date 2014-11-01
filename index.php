@@ -13,6 +13,12 @@ use Nerrad\SlackCb\Http\Request;
 $request = new Request( $_REQUEST );
 
 //react
-$react = new React( $request );
+try {
+	$react = new React( $request );
+} catch (Exception $e){
+	$msg = $e->getMessage();
+	header( $msg, true, 501);
+	exit();
+}
 
 //that's it!
