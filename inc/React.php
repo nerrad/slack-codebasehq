@@ -15,11 +15,9 @@ class React {
 
 	public function __construct( Request $request ) {
 		$this->_config = Config::instance();
-		$webhookReqFactory = new OutgoingWebhookRequestFactory(array());
+		$webhookReqFactory = new OutgoingWebhookRequestFactory($this->_config->webhooks);
 		$webhookReq = $webhookReqFactory->create( $request->get_all() );
 		$triggerWord = $webhookRequest->getTriggerWord();
-
-		$this->_verify_token( $webhookRequest );
 
 
 		//dynamic check for trigger words.
@@ -31,26 +29,6 @@ class React {
 
 		//return json response
 		return new JsonResponse( array( 'text' => $response ) );
-	}
-
-
-	/**
-	 * This ensures that the token incoming is what is expected, otherwise nothing gets done and return 501 http
-	 * code.
-	 *
-	 * @param OutgoingWebhookRequest $request
-	 *
-	 * @return bool|Exception
-	 */
-	private function _verify_token( OutgoingWebhookRequest $request ) {
-		$token = $request->getToken();
-
-		if ( $token != $this->_config->expected_token ) {
-			header( 'Unauthorized.', true, 401 );
-			exit();
-		}
-
-		return true;
 	}
 
 

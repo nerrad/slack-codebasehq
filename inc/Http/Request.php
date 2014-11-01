@@ -10,7 +10,7 @@ class Request {
 
 
 	public function __construct(  $request ) {
-		$this->_reqArray = $_REQUEST;
+		$this->_reqArray = $request;
 	}
 
 

@@ -6,7 +6,7 @@ namespace Nerrad\SlackCb;
 
 class Config {
 	private static $_instance = NULL;
-	public $expected_token = '';
+	public $webhooks = array();
 
 	public function instance() {
 		if ( ! self::$_instance instanceof Config ) {
@@ -17,6 +17,16 @@ class Config {
 
 
 	private function __construct() {
-		$this->expected_token = '';
+		/**
+		 * Format:
+		 * array(
+		 * 	'triggerword' =>  $webhooktoken
+		 * )
+		 *
+		 * @var array
+		 */
+		$this->webhooks = array(
+			'testaction' => ''
+			);
 	}
 }
