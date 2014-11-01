@@ -37,8 +37,8 @@ class React {
 	public function testaction( OutgoingWebhookRequest $request ) {
 		//just a response generated with the incoming data to indicate things went well.
 		$response = 'Test succeeded/';
-		$response .= 'TeamID:'.$request->getTeamID().'/';
-		$response .= 'ChannelD:'.$request->getChannelD().'/';
+		$response .= 'TeamID:'.$request->getTeamId().'/';
+		$response .= 'ChannelD:'.$request->getChanneld().'/';
 		$response .= 'ChannelName:'.$request->getChannelName().'/';
 		$response .= 'UserID:'.$request->getUserId().'/';
 		$response .= 'UserName:'.$request->getUserName().'/';
