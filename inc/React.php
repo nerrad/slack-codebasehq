@@ -58,8 +58,6 @@ class React {
 	 */
 	public function cbtkthelp( OutgoingWebhookRequest $request ) {
 
-		$command_text = file_get_contents( 'available_commands.template.md' );
-
 		$response = array(
 			'text' => "I've grabbed the latest information for you on how to use the codebase-slack integration:",
 			'attachments'  => array(
@@ -82,7 +80,7 @@ class React {
 				)
 			);
 
-
+		return $response;
 	}
 	public function cbgettkt( OutgoingWebhookRequest $request ) {}
 	public function cbposttkt( OutgoingWebhookRequest $request ) {}
