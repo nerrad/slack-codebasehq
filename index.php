@@ -3,6 +3,7 @@
  * An application for recieving messages from slack that in turn triggers a post to codebasehq
  */
 namespace Nerrad\SlackCb;
+use Nerrad\SlackCb\Http;
 require 'vendor/autoload.php';
 require 'configuration.php';
 
