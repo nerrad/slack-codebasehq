@@ -29,7 +29,7 @@ class React {
 		}
 
 		//return json response
-		return new JsonResponse( array( 'text' => $response ) );
+		return new JsonResponse( $response );
 	}
 
 
@@ -44,6 +44,47 @@ class React {
 		$response .= 'UserName:'.$request->getUserName().'/';
 		$response .= 'Text:'.$request->getText().'/';
 		$response .= 'TriggerWord:'.$request->getTriggerWord();
-		return $response;
+		return array( 'text' => $response );
 	}
+
+
+
+	/**
+	 * Returns some help on how to format tkts.
+	 *
+	 * @param OutgoingWebhookRequest $request
+	 *
+	 * @return array
+	 */
+	public function cbtkthelp( OutgoingWebhookRequest $request ) {
+
+		$command_text = file_get_contents( 'available_commands.template.md' );
+
+		$response = array(
+			'text' => "I've grabbed the latest information for you on how to use the codebase-slack integration:",
+			'attachments'  => array(
+				'title' => '*Commands:*',
+				'text' => 'These are various commands that you can use and their format to trigger various codebase interactions',
+				'mrkdwn_in' => array( 'text', 'title' ),
+				'color' => 'good',
+				'fields' => array(
+						array(
+							'title' => 'Some Title',
+							'value' => 'some value',
+							'short' => true
+						),
+						array(
+							'title' => 'Title B',
+							'value' => 'another value',
+							'short' => true
+							)
+					),
+				)
+			);
+
+
+	}
+	public function cbgettkt( OutgoingWebhookRequest $request ) {}
+	public function cbposttkt( OutgoingWebhookRequest $request ) {}
+	public function cbupdatetkt( OutgoingWebhookRequest $request ) {}
 }
