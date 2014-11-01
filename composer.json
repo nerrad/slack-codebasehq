@@ -1,6 +1,12 @@
 {
 	"name": "nerrad/slack-codebasehq",
 	"description":"An application for receiving requests from slack (outgoing webhook) and integrating with Codebasehq for touching tickets and or creating new tickets",
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/nerrad/slack-codebasehq"
+		}
+	]
 	"keywords": ["slack", "api", "codebase"],
 	"type": "application",
 	"license": "MIT",
