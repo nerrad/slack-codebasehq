@@ -22,4 +22,31 @@ class Request {
 	public function get( $var ) {
 		return isset( $this->_reqArray[$var] ) ? $this->_reqArray[$var] : null;
 	}
+
+
+	/**
+	 * This just returns the required options
+	 *
+	 * @return array
+	 */
+	public function get_required() {
+		$required = array(
+			'token',
+			'team_id',
+			'channel_id',
+			'channel_name',
+			'timestamp',
+			'user_id',
+			'user_name',
+			'text',
+			'trigger_word'
+			);
+		$send = array();
+		foreach ( $this->_reqArray as $key => $value ) {
+			if ( isset( $required[$key] ) ) {
+				$send[$key] = $value;
+			}
+		}
+		return $send;
+	}
 }

@@ -17,7 +17,7 @@ class React {
 	public function __construct( Request $request ) {
 		$this->_config = Config::instance();
 		$webhookReqFactory = new OutgoingWebhookRequestFactory($this->_config->webhooks);
-		$webhookReq = $webhookReqFactory->create( $request->get_all() );
+		$webhookReq = $webhookReqFactory->create( $request->get_required() );
 		$triggerWord = $webhookReq->getTriggerWord();
 
 
