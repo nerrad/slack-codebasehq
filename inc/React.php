@@ -38,7 +38,7 @@ class React {
 		//just a response generated with the incoming data to indicate things went well.
 		$response = 'Test succeeded/';
 		$response .= 'TeamID:'.$request->getTeamId().'/';
-		$response .= 'ChannelD:'.$request->getChanneld().'/';
+		$response .= 'ChannelD:'.$request->getChannelId().'/';
 		$response .= 'ChannelName:'.$request->getChannelName().'/';
 		$response .= 'UserID:'.$request->getUserId().'/';
 		$response .= 'UserName:'.$request->getUserName().'/';
