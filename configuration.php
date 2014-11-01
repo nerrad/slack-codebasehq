@@ -20,13 +20,17 @@ class Config {
 		/**
 		 * Format:
 		 * array(
-		 * 	'triggerword' =>  $webhooktoken
+		 * 	'triggerword' =>  array(
+		 * 		'token' => $webhooktoken
+		 * 		)
 		 * )
 		 *
 		 * @var array
 		 */
 		$this->webhooks = array(
-			'testaction' => ''
+			'testaction' => array(
+				'token' => ''
+				)
 			);
 	}
 }
