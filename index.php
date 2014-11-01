@@ -4,6 +4,7 @@
  */
 namespace Nerrad\SlackCb;
 require 'vendor/autoload.php';
+require 'configuration.php';
 
 //grab request and assign to react class
 $request = new Request( $_REQUEST );

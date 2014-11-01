@@ -6,23 +6,51 @@ namespace Nerrad\SlackCb;
 
 use Nerrad\SlackCb\Http\Request;
 use Nerrad\SlackCb\Http\JsonResponse;
+use Nerrad\SlackCb\Config;
 use CL\Slack\OutgoingWebhook\Request\OutgoingWebhookRequest;
 
 class React {
+
+	private $_config = null;
+
 	public function __construct( Request $request ) {
+		$this->_config = Config::instance();
 		$webhookReqFactory = new OutgoingWebhookRequestFactory();
 		$webhookReq = $webhookReqFactory->create( $request->get_all );
 		$triggerWord = $webhookRequest->getTriggerWord();
 
+		$this->_verify_token( $webhookRequest );
+
+
 		//dynamic check for trigger words.
-		if ( method_exists($this, $trigger_word ) ) {
-			$response = $this->$trigger_word( $webhookReq );
+		if ( method_exists($this, $triggerWord ) ) {
+			$response = $this->$triggerWord( $webhookReq );
 		} else {
 			throw new \InvalidArgumentException( sprintf( 'Unknown tirgger-word: %s', $triggerWord) );
 		}
 
 		//return json response
 		return new JsonResponse( [ 'text' => $response ] );
+	}
+
+
+	/**
+	 * This ensures that the token incoming is what is expected, otherwise nothing gets done and return 501 http
+	 * code.
+	 *
+	 * @param OutgoingWebhookRequest $request
+	 *
+	 * @return bool|Exception
+	 */
+	private function _verify_token( OutgoingWebhookRequest $request ) {
+		$token = $request->getToken();
+
+		if ( $token != $this->_config->expected_token ) {
+			header( 'Unauthorized.', true, 501 );
+			exit();
+		}
+
+		return true;
 	}
 
 
