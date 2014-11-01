@@ -17,7 +17,7 @@ class React {
 		$this->_config = Config::instance();
 		$webhookReqFactory = new OutgoingWebhookRequestFactory($this->_config->webhooks);
 		$webhookReq = $webhookReqFactory->create( $request->get_all() );
-		$triggerWord = $webhookRequest->getTriggerWord();
+		$triggerWord = $webhookReq>getTriggerWord();
 
 
 		//dynamic check for trigger words.
