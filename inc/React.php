@@ -7,7 +7,7 @@ namespace Nerrad\SlackCb;
 use Nerrad\SlackCb\Http\Request;
 use Nerrad\SlackCb\Http\JsonResponse;
 use Nerrad\SlackCb\Config;
-use CL\Slack\OutgoingWebhook\Request\OutgoingWebhookRequest;
+use CL\Slack\OutgoingWebhook\Request\OutgoingWebhookRequestFactory;
 
 class React {
 
