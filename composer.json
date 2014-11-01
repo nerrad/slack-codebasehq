@@ -5,6 +5,10 @@
 		{
 			"type": "vcs",
 			"url": "https://github.com/nerrad/slack-codebasehq"
+		},
+		{
+			"type": "vcs",
+			"url": "https://github.com/nerrad/Codebase-PHP-wrapper"
 		}
 	],
 	"keywords": ["slack", "api", "codebase"],
@@ -18,7 +22,8 @@
 		}
 	],
 	"require" : {
-		"cleentfaar/slack" : "0.9.4"
+		"cleentfaar/slack" : "0.9.4",
+		"nerrad/Codebase-PHP-Wrapper" : "dev-master"
 	},
 	"autoload" : {
 		"psr-4":{
