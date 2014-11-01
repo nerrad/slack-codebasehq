@@ -15,7 +15,7 @@ $request = new Request( $_REQUEST );
 //react
 try {
 	$react = new React( $request );
-} catch (Exception $e){
+} catch ( \Exception $e){
 	$msg = $e->getMessage();
 	header( $msg, true, 501);
 	exit();
