@@ -2,6 +2,12 @@
 
 This is a php application you can put on your server to serve as the endpoint for a [Slack](http://slack.com) ougoing webhook.  It's purpose is to enable you to use trigger words in your chat to communicate with your [CodebaseHQ](http://codebashq.com) account and trigger the folowing events:
 
+### Get a message about of all the commands that can be used
+
+```
+cbtkthelp
+```
+
 ### Get the last 5 tickets posted in a given project
 
 ```
