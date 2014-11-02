@@ -8,6 +8,8 @@ require 'configuration.php';
 
 use Nerrad\SlackCb\Http\Request;
 
+define( 'CB_SLACK_BASE_PATH', dirname( __FILE__ ) );
+
 
 //grab request and assign to react class
 $request = new Request( $_REQUEST );
