@@ -58,13 +58,13 @@ class React {
 	 */
 	public function cbtkthelp( OutgoingWebhookRequest $request ) {
 
-		$helptext = file_get_contents( 'cbtkthelp.template.md' );
+		$helptext = file_get_contents( 'cbtkthelp.template.md', FILE_USE_INCLUDE_PATH );
 
 		$response = array(
 			'text' => "I've grabbed the latest information for you on how to use the codebase-slack integration:",
 			'attachments'  => array(
 					array(
-						'title' => '*Commands:*',
+						'title' => 'Commands:',
 						'text' => $helptext,
 						'mrkdwn_in' => array( 'text', 'title' ),
 						'color' => 'good'
@@ -74,7 +74,39 @@ class React {
 
 		return $response;
 	}
-	public function cbgettkt( OutgoingWebhookRequest $request ) {}
+
+
+	public function cbgettkt( OutgoingWebhookRequest $request ) {
+		$incoming_text = $request->getText();
+		$parsed_text = $this->_parse_params( $incoming_text );
+		return array( 'text' => $parsed_text);
+	}
 	public function cbposttkt( OutgoingWebhookRequest $request ) {}
 	public function cbupdatetkt( OutgoingWebhookRequest $request ) {}
+
+
+
+	/**
+	 * This parses a given strings for params in the format [key:value] and returns an array with the found params
+	 * and the original string minus the parsed content.
+	 *
+	 *
+	 * @param string $text_to_parse The incoming string that could have the key value pairs.
+	 *
+	 * @return array
+	 */
+	private function _parse_params( $text_to_parse ) {
+		preg_match_all( '/\[.+?\]/', $text_to_parse, $matches );
+		$parsed_text = $text_to_parse;
+		$parsed_matches = array();
+		foreach ( $matches[0] as $match ) {
+			$parsed = preg_replace( '/\[|\]/', '', $match );
+			$parsed = explode( ':', $parsed );
+			if ( is_array( $parsed ) && count( $parsed) == 2 ) {
+				$parsed_matches[$parsed[0]] = $parsed[1];
+			}
+			$parsed_text = str_replace( $match, '', $parsed_text );
+		}
+		return array( 'parsed_text' => $parsed_text, 'parsed_matches' => $parsed_matches );
+	}
 }
