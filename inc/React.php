@@ -87,18 +87,94 @@ class React {
 			return array( 'text' => $e->getMessage() );
 		}
 
-		$query = !empty( $parsed_item['parsed_matches']['tkt'] ) ? $parsed_item['parsed_matches']['tkt'] : 'sort:date';
+		$query = 'sort:date';
+		$ticket_id = !empty( $parsed_item['parsed_matches']['tkt'] ) ? $parsed_item['parsed_matches']['tkt'] : null;
 
 		$project = !empty( $parsed_item['parsed_matches']['project'] ) ? $parsed_item['parsed_matches']['project'] : $this->_config->default_project;
 
-		$ticket_info = $this->_cbclient->tickets($project, $query);
-		// grab the first 5 in the returned data
-		$chunked = array_chunk( $ticket_info, 5 );
-		$ticket_info = $chunked[0];
+		$tickets = !empty( $ticket_id) ? $this->_cbclient->ticket( $project, $ticket_id) : $this->_cbclient->tickets($project, $query);
+
+		// grab the first 5 in the returned data IF not a single ticket
+		if ( empty( $ticket_id ) ) {
+			$chunked = array_chunk( $tickets, 5 );
+			$ticket_info = $chunked[0];
+		} else {
+			$ticket_info[] = $tickets;
+		}
 		$ticket_content = $this->_generate_ticket_display( $ticket_info, $project );
 		return $ticket_content;
 	}
-	public function cbposttkt( OutgoingWebhookRequest $request ) {}
+
+
+
+	/**
+	 * for posting tickets
+	 *
+	 * @param OutgoingWebhookRequest $request
+	 *
+	 * @return  array
+	 */
+	public function cbposttkt( OutgoingWebhookRequest $request ) {
+		$incoming_text = $request->getText();
+		$parsed_item = $this->_parse_params( $incoming_text );
+
+		try {
+			$this->_set_client( $request );
+		} catch( \Exception $e ) {
+			return array( 'text' => $e->getMessage() );
+		}
+
+		$options = array();
+		//certain params require translation to the correct id.
+		//assignee
+		if ( !empty( $parsed_item['parsed_matches']['assigned'] ) ) {
+			$assignee = $parsed_item['parsed_matches']['assigned'];
+			$user = $this->_cbclient->users( $assignee );
+			$options['assignee-id'] = $user['id'];
+		}
+
+		//project
+		$options['project'] = !empty( $parsed_item['parsed_matches']['project'] ) ? $parsed_item['parsed_matches']['project'] : $this->_config->default_project;
+
+		//type
+		if ( !empty( $parsed_item['parsed_matches']['type'] ) ) {
+			$options['ticket-type'] = $parsed_item['parsed_matches']['type'];
+		}
+
+		//priority
+		if ( !empty( $parsed_item['parsed_matches']['priority'] ) ) {
+			$priority = $parsed_item['parsed_matches']['priority'];
+			$priorities = $this->_cbclient->priorities( $options['project'] );
+			foreach ( $priorities as $prity ) {
+				if ( $prity['name'] == ucwords( $priority ) ) {
+					$options['priority-id'] = $prity['id'];
+					break;
+				}
+			}
+		}
+
+		//status
+		if ( !empty( $parsed_item['parsed_matches']['status'] ) ) {
+			$status = $parsed_item['parsed_matches']['status'];
+			$statuses = $this->_cbclient->statuses( $options['project'] );
+			foreach ( $statuses as $stat ) {
+				if ( $stat['name'] == ucwords( $status ) ) {
+					$options['status-id'] = $stat['id'];
+					break;
+				}
+			}
+		}
+
+		$options['description'] = trim( str_replace( $request->getTriggerWord(), '', $parsed_item['parsed_text'] ) );
+		$pos = strpos( $description, ' ', 15 );
+		$shortened_desc = substr( $description, 0, $pos ) . '...';
+		$options['summary'] = ! empty( $parsed_item['parsed_matches']['summary'] ) ? $parsed_item['parsed_matches']['summary'] : $shortened_desc;
+
+		//all options set now post
+		$posted = $this->_cbclient->addTicket( $options['project'], $options, array() );
+		return $posted ? array( 'text' => 'Ticket has been created.' ) : array( 'text' => 'Ticket was not created, api might be down' );
+
+	}
 	public function cbupdatetkt( OutgoingWebhookRequest $request ) {}
 
 
@@ -159,7 +235,7 @@ class React {
 	 */
 	private function _generate_ticket_display( $tickets, $project ) {
 		$template = 'cbtktget.template.php';
-		$response['text'] = count( $ticket_info ) > 1 ? 'Here\'s the tickets you requested:' : 'Here is the ticket you requested';
+		$response['text'] = count( $tickets) > 1 ? 'Here\'s the tickets you requested:' : 'Here is the ticket you requested';
 		$response['attachments'] = array();
 
 		foreach ( $tickets as $ticket ) {
@@ -193,5 +269,6 @@ class React {
 			'blue' => '#2ea2cc',
 			'red' => 'danger'
 			);
+		return isset( $color_map[$color_string] ) ? $color_map[$color_string] : $color_string;
 	}
 }
