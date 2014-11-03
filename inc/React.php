@@ -172,7 +172,14 @@ class React {
 
 		//all options set now post
 		$posted = $this->_cbclient->addTicket( $options['project'], $options, array() );
-		return $posted ? array( 'text' => 'Ticket has been created.' ) : array( 'text' => 'Ticket was not created, api might be down' );
+
+		if ( !empty( $posted ) ) {
+			$ticket_info[] = $posted;
+			$content = $this->_generate_ticket_display( $ticket_info, $options['project'], true );
+		} else {
+			$content =  array( 'text' => 'Ticket was not created, api might be down' );
+		}
+		return $content;
 
 	}
 	public function cbupdatetkt( OutgoingWebhookRequest $request ) {}
@@ -233,9 +240,13 @@ class React {
 	 *
 	 * @return array content for slack
 	 */
-	private function _generate_ticket_display( $tickets, $project ) {
+	private function _generate_ticket_display( $tickets, $project, $new = FALSE ) {
 		$template = 'cbtktget.template.php';
-		$response['text'] = count( $tickets) > 1 ? 'Here\'s the tickets you requested:' : 'Here is the ticket you requested';
+		if ( $new ) {
+			$response['text'] = 'Ticket created successfully, here\'s some info';
+		} else {
+			$response['text'] = count( $tickets) > 1 ? 'Here\'s the tickets you requested:' : 'Here is the ticket you requested';
+		}
 		$response['attachments'] = array();
 
 		foreach ( $tickets as $ticket ) {
