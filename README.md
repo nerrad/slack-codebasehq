@@ -1,6 +1,6 @@
 ##Slack to Codebase Webhook
 
-This is a php application you can put on your server to serve as the endpoint for a [Slack](http://slack.com) ougoing webhook.  It's purpose is to enable you to use trigger words in your chat to communicate with your [CodebaseHQ](http://codebashq.com) account and trigger the folowing events:
+This is a php application you can put on your server to serve as the endpoint for a [Slack](http://slack.com) outgoing webhook.  It's purpose is to enable you to use trigger words in your chat to communicate with your [CodebaseHQ](http://codebashq.com) account and trigger the folowing events:
 
 ### Get a message about of all the commands that can be used
 
@@ -26,7 +26,7 @@ cbgettkt [tkt: 1234]
 cbposttkt [project:my-project] [assigned:nerrad] [type:bug] [priority:low] [status:new] [summary: This is an optional summary, if not included, a condensed version of chat message will be used]  Your chat message becomes the initial ticket description.
 ```
 
-### Update an existing ticket in codebase  (not implemented yet)
+### Update an existing ticket in codebase
 
 ```
 cbupdatetkt [tkt: 1234] [type:bug] [priority:high] [status:completed] [assigned:nerrad] This chat message gets appended as a note to the ticket.
