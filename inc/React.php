@@ -116,6 +116,65 @@ class React {
 	 */
 	public function cbposttkt( OutgoingWebhookRequest $request ) {
 		$incoming_text = $request->getText();
+
+		$options = $this->_parse_options_from_message( $incoming_text, $request );
+
+		//if ticket_id is present then remove it
+		if ( ! empty( $options['ticket_id'] ) ) {
+			unset( $options['ticket_id'] );
+		}
+
+		//all options set now post
+		$posted = $this->_cbclient->addTicket( $options['project'], $options, array() );
+
+		if ( !empty( $posted ) ) {
+			$ticket_info[] = $posted;
+			$content = $this->_generate_ticket_display( $ticket_info, $options['project'], true );
+		} else {
+			$content =  array( 'text' => 'Ticket was not created, the codebasehq api might be down.' );
+		}
+		return $content;
+
+	}
+
+
+
+	/**
+	 * for posting ticket updates
+	 *
+	 * @param OutgoingWebhookRequest $request
+	 *
+	 * @return array
+	 */
+	public function cbupdatetkt( OutgoingWebhookRequest $request ) {
+		$incoming_text = $request->getText();
+		$options = $this->_parse_options_from_message( $incoming_text, $request, true );
+
+		//need ticketID for update
+		if ( empty( $options['ticket_id'] ) ) {
+			return array( 'text' => 'Unable to update ticket because need the ticket id to be updated.  Make sure the content of your message has this indicated using the format `[tkt:1234]`' );
+		}
+
+		$note = $this->_cbclient->note( $options['project'], $options['description'], $options['ticket_id'], $options );
+		$url = 'https://' . $this->_config->account . '.codebasehq.com/projects/' . $options['project'] . '/tickets/' . $options['ticket_id'];
+		$content = !empty( $note ) ? '<' . $url . '|Ticket> successfully updated.' : 'Ticket was not update, the codebasehq api might be down.';
+		return array( 'text' => $content );
+	}
+
+
+
+
+	/**
+	 * This simply parses the incoming text for any [option:value] in the strings and returns the $options array used
+	 * for the codebase api.
+	 *
+	 * @param string $incoming_text The incoming message text
+	 * @param OutgoingWebhookRequest $request
+	 * @param bool $update Whether retrieving options for an update or not.
+	 *
+	 * @return array Array of options with their values.
+	 */
+	private function _parse_options_from_message( $incoming_text,  OutgoingWebhookRequest $request, $update = false ) {
 		$parsed_item = $this->_parse_params( $incoming_text );
 
 		try {
@@ -135,6 +194,8 @@ class React {
 
 		//project
 		$options['project'] = !empty( $parsed_item['parsed_matches']['project'] ) ? $parsed_item['parsed_matches']['project'] : $this->_config->default_project;
+		//ticket_id
+		$options['ticket_id'] = !empty( $parsed_item['parsed_matches']['tkt'] ) ? $parsed_item['parsed_matches']['tkt'] : null;
 
 		//type
 		if ( !empty( $parsed_item['parsed_matches']['type'] ) ) {
@@ -165,24 +226,20 @@ class React {
 			}
 		}
 
+		//summary and description.
 		$options['description'] = trim( str_replace( $request->getTriggerWord(), '', $parsed_item['parsed_text'] ) );
-		$pos = strpos( $description, ' ', 15 );
-		$shortened_desc = substr( $description, 0, $pos ) . '...';
-		$options['summary'] = ! empty( $parsed_item['parsed_matches']['summary'] ) ? $parsed_item['parsed_matches']['summary'] : $shortened_desc;
-
-		//all options set now post
-		$posted = $this->_cbclient->addTicket( $options['project'], $options, array() );
-
-		if ( !empty( $posted ) ) {
-			$ticket_info[] = $posted;
-			$content = $this->_generate_ticket_display( $ticket_info, $options['project'], true );
+		if ( $update ) {
+			//only include summary if explicitly set.
+			if ( !empty( $parsed_item['parsed_matches']['summary'] ) ) {
+				$options['summary'] = $parsed_item['parsed_matches']['summary'];
+			}
 		} else {
-			$content =  array( 'text' => 'Ticket was not created, api might be down' );
+			$pos = strpos( $options['description'], ' ', 15 );
+			$shortened_desc = substr( $options['description'], 0, $pos ) . '...';
+			$options['summary'] = ! empty( $parsed_item['parsed_matches']['summary'] ) ? $parsed_item['parsed_matches']['summary'] : $shortened_desc;
 		}
-		return $content;
-
+		return $options;
 	}
-	public function cbupdatetkt( OutgoingWebhookRequest $request ) {}
 
 
 
@@ -237,15 +294,21 @@ class React {
 	 *
 	 * @param array $ticket_info Array of ticket info returned from codebase
 	 * @param string $project   The project for the ticket
+	 * @param bool  $new Whether this is a new ticket or not that was created.
+	 * @param string $message_string If this is not empty then this string gets used for the message (and overrides the auto generated message).  However attachments are still created.
 	 *
 	 * @return array content for slack
 	 */
-	private function _generate_ticket_display( $tickets, $project, $new = FALSE ) {
+	private function _generate_ticket_display( $tickets, $project, $new = FALSE, $message_string = '' ) {
 		$template = 'cbtktget.template.php';
-		if ( $new ) {
-			$response['text'] = 'Ticket created successfully, here\'s some info';
+		if ( !empty( $message_string ) ) {
+			$response['text'] = $message_string;
 		} else {
-			$response['text'] = count( $tickets) > 1 ? 'Here\'s the tickets you requested:' : 'Here is the ticket you requested';
+			if ( $new ) {
+				$response['text'] = 'Ticket created successfully, here\'s some info';
+			} else {
+				$response['text'] = count( $tickets) > 1 ? 'Here\'s the tickets you requested:' : 'Here is the ticket you requested';
+			}
 		}
 		$response['attachments'] = array();
 
