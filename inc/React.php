@@ -152,7 +152,7 @@ class React {
 
 		//need ticketID for update
 		if ( empty( $options['ticket_id'] ) ) {
-			return array( 'text' => 'Unable to update ticket because need the ticket id to be updated.  Make sure the content of your message has this indicated using the format `[tkt:1234]`' );
+			return array( 'text' => 'Unable to update ticket because I need the ticket id of the ticket to update.  Make sure the content of your message has this indicated using the format `[tkt:1234]`' );
 		}
 
 		$note = $this->_cbclient->note( $options['project'], $options['description'], $options['ticket_id'], $options );
